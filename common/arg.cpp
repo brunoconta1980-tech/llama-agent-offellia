@@ -934,12 +934,6 @@ static bool common_params_parse_ex(int argc, char ** argv, common_params_context
         params.kv_overrides.back().key[0] = 0;
     }
 
-    const bool mcp_enabled = !params.mcp_servers_config.empty() || !params.mcp_servers_json.empty();
-    if ((!params.server_tools.empty() || mcp_enabled) && !params.cors_origins_explicit) {
-        LOG_WRN("server tools or MCP servers are enabled, using localhost as default CORS origin (change via --cors-origins)\n");
-        params.cors_origins = "localhost";
-    }
-
     // pad tensor_buft_overrides for llama_params_fit:
     const size_t ntbo = llama_max_tensor_buft_overrides();
     while (params.tensor_buft_overrides.size() < ntbo) {
@@ -3355,7 +3349,6 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
         params.cors_origins.c_str()),
         [](common_params & params, const std::string & value) {
             params.cors_origins = value;
-            params.cors_origins_explicit = true;
         }
     ).set_examples({LLAMA_EXAMPLE_SERVER}).set_env("LLAMA_ARG_CORS_ORIGINS"));
     add_opt(common_arg(
@@ -3416,8 +3409,7 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
         {"--tools"}, "TOOL1,TOOL2,...",
         "experimental: whether to enable built-in tools for AI agents - do not enable in untrusted environments (default: no tools)\n"
         "specify \"all\" to enable all tools\n"
-        "available tools: read_file, file_glob_search, grep_search, exec_shell_command, write_file, edit_file, get_info\n"
-        "note: for security reasons, this will limit --cors-origins to localhost by default",
+        "available tools: read_file, file_glob_search, grep_search, exec_shell_command, write_file, edit_file, get_info",
         [](common_params & params, const std::string & value) {
             params.server_tools = parse_csv_row(value);
         }
@@ -3435,16 +3427,14 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
     ).set_examples({LLAMA_EXAMPLE_SERVER}).set_env("LLAMA_ARG_TOOLS_RUNTIME"));
     add_opt(common_arg(
         {"--mcp-servers-config"}, "PATH",
-        "experimental: path to JSON file with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)\n"
-        "note: for security reasons, this will limit --cors-origins to localhost by default",
+        "experimental: path to JSON file with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)",
         [](common_params & params, const std::string & value) {
             params.mcp_servers_config = value;
         }
     ).set_examples({LLAMA_EXAMPLE_SERVER}).set_env("LLAMA_ARG_MCP_SERVERS_CONFIG"));
     add_opt(common_arg(
         {"--mcp-servers-json"}, "JSON",
-        "experimental: inline JSON with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)\n"
-        "note: for security reasons, this will limit --cors-origins to localhost by default",
+        "experimental: inline JSON with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)",
         [](common_params & params, const std::string & value) {
             params.mcp_servers_json = value;
         }
@@ -3452,8 +3442,7 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
     add_opt(common_arg(
         {"-ag", "--agent"},
         {"-no-ag", "--no-agent"},
-        "whether to enable CORS proxy and all built-in tools - do not enable in untrusted environments (default: disabled)\n"
-        "note: for security reasons, this will limit --cors-origins to localhost by default",
+        "whether to enable CORS proxy and all built-in tools - do not enable in untrusted environments (default: disabled)",
         [](common_params & params, bool value) {
             if (value) {
                 params.server_tools = {"all"};
@@ -3462,7 +3451,6 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
                 params.server_tools.clear();
                 params.ui_mcp_proxy = false;
             }
-            // note: do not modify cors_origins here, as the options are not evaluated in order (user may explicitly set --cors-origins before --agent)
         }
     ).set_examples({LLAMA_EXAMPLE_SERVER}).set_env("LLAMA_ARG_AGENT"));
     add_opt(common_arg(

@@ -177,11 +177,12 @@ int main(int argc, char ** argv) {
     int prev_len = 0;
     while (true) {
         // get user input
-        printf("\033[32m> \033[0m");
+        printf("\033[38;2;51;255;51m> ");
         std::string user;
         std::getline(std::cin, user);
 
         if (user.empty()) {
+            printf("\033[0m");
             break;
         }
 
@@ -203,9 +204,9 @@ int main(int argc, char ** argv) {
         std::string prompt(formatted.begin() + prev_len, formatted.begin() + new_len);
 
         // generate a response
-        printf("\033[33m");
+        printf("\033[1;38;2;186;255;186m");
         std::string response = generate(prompt);
-        printf("\n\033[0m");
+        printf("\n\033[0;38;2;51;255;51m");
 
         // add the response to the messages
         messages.push_back({"assistant", strdup(response.c_str())});

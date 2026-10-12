@@ -884,8 +884,8 @@ static int test_backends(const std::string & arch_filter, const size_t seed, con
 
                 std::pair<llama_model_ptr, llama_context_ptr> model_and_ctx_dev;
                 std::vector<float> logits_dev;
-                std::string status_nmse      = "\033[1;33mSKIP\033[0m";
-                std::string status_roundtrip = "\033[1;33mSKIP\033[0m";
+                std::string status_nmse      = "\033[1;38;2;40;210;64mSKIP\033[0m";
+                std::string status_roundtrip = "\033[1;38;2;40;210;64mSKIP\033[0m";
                 char nmse_str[12] = {0};
 
                 bool skip = !arch_supported(arch) || (dc.split_mode == LLAMA_SPLIT_MODE_TENSOR && dc.devs.empty());
@@ -902,14 +902,14 @@ static int test_backends(const std::string & arch_filter, const size_t seed, con
                         logits_dev = get_logits(model_and_ctx_dev.first.get(), model_and_ctx_dev.second.get(), tokens, encode);
                         const double nmse_val = nmse(logits_cpu, logits_dev);
                         snprintf(nmse_str, sizeof(nmse_str), "(%.2e)", nmse_val);
-                        status_nmse = "\033[1;32mOK\033[0m";
+                        status_nmse = "\033[38;2;51;255;51mOK\033[0m";
                         if (nmse_val > 1e-4) {
                             test_ok = false;
-                            status_nmse = "\033[1;31mFAIL\033[0m";
+                            status_nmse = "\033[1;38;2;186;255;186mFAIL\033[0m";
                         }
                         if (!encode && !check_causal_attn_toggle(model_and_ctx_dev.first.get(), model_and_ctx_dev.second.get(), tokens)) {
                             if (test_ok) {
-                                status_nmse = "\033[1;31mFAIL\033[0m (toggle)";
+                                status_nmse = "\033[1;38;2;186;255;186mFAIL\033[0m (toggle)";
                             }
                             test_ok = false;
                         }
@@ -930,12 +930,12 @@ static int test_backends(const std::string & arch_filter, const size_t seed, con
                         auto model_and_ctx_roundtrip = get_model_and_ctx(nullptr, file, seed, stdev, dc.devs, dc.split_mode, encode);
                         const std::vector<float> logits_roundtrip = get_logits(
                             model_and_ctx_roundtrip.first.get(), model_and_ctx_roundtrip.second.get(), tokens, encode);
-                        status_roundtrip = "\033[1;32mOK\033[0m";
+                        status_roundtrip = "\033[38;2;51;255;51mOK\033[0m";
                         GGML_ASSERT(logits_roundtrip.size() == logits_dev.size());
                         for (size_t i = 0; i < logits_roundtrip.size(); i++) {
                             if (logits_roundtrip[i] != logits_dev[i]) {
                                 test_ok = false;
-                                status_roundtrip = "\033[1;31mFAIL\033[0m";
+                                status_roundtrip = "\033[1;38;2;186;255;186mFAIL\033[0m";
                                 break;
                             }
                         }

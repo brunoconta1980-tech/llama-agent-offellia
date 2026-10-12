@@ -130,11 +130,11 @@ int main(int argc, char ** argv) {
         LOG_INF("%s: NMSE=%.3e\n", __func__, nmse_val);
 
         if (nmse_val > 1e-6) {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             return 1;
         }
 
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         return 0;
     }
 

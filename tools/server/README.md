@@ -201,11 +201,11 @@ For the full list of features, please refer to [server's changelog](https://gith
 | `--ui-config, --webui-config JSON` | JSON that provides default UI settings (overrides UI defaults)<br/>(env: LLAMA_ARG_UI_CONFIG) |
 | `--ui-config-file, --webui-config-file PATH` | JSON file that provides default UI settings (overrides UI defaults)<br/>(env: LLAMA_ARG_UI_CONFIG_FILE) |
 | `--ui-mcp-proxy, --webui-mcp-proxy, --no-ui-mcp-proxy, --no-webui-mcp-proxy` | experimental: whether to enable MCP CORS proxy - do not enable in untrusted environments (default: disabled)<br/>(env: LLAMA_ARG_UI_MCP_PROXY) |
-| `--tools TOOL1,TOOL2,...` | experimental: whether to enable built-in tools for AI agents - do not enable in untrusted environments (default: no tools)<br/>specify "all" to enable all tools<br/>available tools: read_file, file_glob_search, grep_search, exec_shell_command, write_file, edit_file, get_info<br/>note: for security reasons, this will limit --cors-origins to localhost by default<br/>(env: LLAMA_ARG_TOOLS) |
+| `--tools TOOL1,TOOL2,...` | experimental: whether to enable built-in tools for AI agents - do not enable in untrusted environments (default: no tools)<br/>specify "all" to enable all tools<br/>available tools: read_file, file_glob_search, grep_search, exec_shell_command, write_file, edit_file, get_info<br/>(env: LLAMA_ARG_TOOLS) |
 | `--tools-runtime OPTION` | experimental: run tools in a separate runtime environment (default: none, use host environment)<br/>available options:<br/>  'docker:<image>', 'podman:<image>': spin up a new container and reuse it for all invocations, clean up on server exit<br/>  'docker-container:<id>', 'podman-container:<id>': use an existing container by ID, won't stop on server exit<br/>  'ssh:<target>': run tools on a remote POSIX host over SSH, key-based auth and a trusted host key are required<br/><br/>(env: LLAMA_ARG_TOOLS_RUNTIME) |
-| `--mcp-servers-config PATH` | experimental: path to JSON file with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)<br/>note: for security reasons, this will limit --cors-origins to localhost by default<br/>(env: LLAMA_ARG_MCP_SERVERS_CONFIG) |
-| `--mcp-servers-json JSON` | experimental: inline JSON with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)<br/>note: for security reasons, this will limit --cors-origins to localhost by default<br/>(env: LLAMA_ARG_MCP_SERVERS_JSON) |
-| `-ag, --agent, -no-ag, --no-agent` | whether to enable CORS proxy and all built-in tools - do not enable in untrusted environments (default: disabled)<br/>note: for security reasons, this will limit --cors-origins to localhost by default<br/>(env: LLAMA_ARG_AGENT) |
+| `--mcp-servers-config PATH` | experimental: path to JSON file with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)<br/>(env: LLAMA_ARG_MCP_SERVERS_CONFIG) |
+| `--mcp-servers-json JSON` | experimental: inline JSON with MCP server definitions (Cursor-compatible format) - do not enable in untrusted environments (default: none)<br/>(env: LLAMA_ARG_MCP_SERVERS_JSON) |
+| `-ag, --agent, -no-ag, --no-agent` | whether to enable CORS proxy and all built-in tools - do not enable in untrusted environments (default: disabled)<br/>(env: LLAMA_ARG_AGENT) |
 | `--ui, --webui, --no-ui, --no-webui` | whether to enable the Web UI (default: enabled)<br/>(env: LLAMA_ARG_UI) |
 | `--embedding, --embeddings` | restrict to only support embedding use case; use only with dedicated embedding models (default: disabled)<br/>(env: LLAMA_ARG_EMBEDDINGS) |
 | `--rerank, --reranking` | enable reranking endpoint on server (default: disabled)<br/>(env: LLAMA_ARG_RERANKING) |
@@ -380,7 +380,7 @@ The same JSON can be passed inline with `--mcp-servers-json`. Each entry under `
 
 Every server is spawned once at startup to list its tools, then stopped, and respawned on demand when one of its tools is called. Tools are exposed as `<server>_<tool>` alongside the built-in ones: they show up in the Web UI and in `GET /tools`, and the model calls them like any other tool. A name colliding with an already registered tool is skipped. This is independent of `--tools`, MCP servers can be the only tools available.
 
-The child process runs with the same privileges as the server, so only declare commands you trust. As with `--tools`, `--cors-origins` then defaults to `localhost`.
+The child process runs with the same privileges as the server, so only declare commands you trust. Enabling tools or MCP does not change `--cors-origins`.
 
 Note: `--ui-mcp-proxy` is unrelated, it only lets the Web UI reach remote MCP servers from the browser.
 
@@ -388,9 +388,7 @@ Any server written against the [MCP specification](https://modelcontextprotocol.
 
 ### CORS
 
-By default the server reflects any `Origin` header back with credentials allowed. This matches the old, always-on `*` behavior and is fine as long as the server only exposes stateless, read-only endpoints.
-
-Enabling `--tools` or `--agent` exposes file read/write over the API, so in that case `--cors-origins` defaults to `localhost` instead: only pages served from localhost can reach the server. Pass `--cors-origins` explicitly to override either default.
+By default the server reflects any `Origin` header back with credentials allowed. `--tools`, `--agent` and MCP do not narrow that default. Pass `--cors-origins` yourself when you want a shorter list. `--cors-origins localhost` still reflects only localhost origins.
 
 Recommended `--cors-origins` setting, depending on where the server runs:
 
@@ -398,7 +396,7 @@ Recommended `--cors-origins` setting, depending on where the server runs:
 | ---------- | --------------- |
 | Public | set an API key, put the server behind a reverse proxy, `--cors-origins` optional |
 | Local network | set `--cors-origins` to your frontend's origin |
-| Same machine | `--cors-origins localhost` (default once `--agent` is set) |
+| Same machine | `--cors-origins localhost` when you want to refuse other origins |
 
 Related flags: `--cors-origins`, `--cors-methods`, `--cors-headers`, `--cors-credentials` / `--no-cors-credentials`. Background and rationale: [#25655](https://github.com/ggml-org/llama.cpp/pull/25655).
 

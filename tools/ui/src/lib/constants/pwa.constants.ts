@@ -300,8 +300,13 @@ export const SPLASH_LINK = {
 import type { SvelteKitPWAOptions } from '@vite-pwa/sveltekit';
 
 export const SVELTEKIT_PWA_OPTIONS: SvelteKitPWAOptions = {
+	// Generate a service worker that unregisters itself and drops caches.
+	// A normal Workbox worker precaches the Vite build, including the favicon,
+	// and then keeps serving that snapshot after the files change.
+	selfDestroying: true,
+
 	devOptions: {
-		enabled: true,
+		enabled: false,
 		suppressWarnings: true
 	},
 

@@ -524,12 +524,12 @@ static user_command_result run_user_command(const std::string & command,
 }
 
 const char * LLAMA_AGENT_LOGO = R"(
-    ____                                                   __
-   / / /___ _____ ___  ____ _      ____ _____ ____  ____  / /_
-  / / / __ `/ __ `__ \/ __ `/_____/ __ `/ __ `/ _ \/ __ \/ __/
- / / / /_/ / / / / / / /_/ /_____/ /_/ / /_/ /  __/ / / / /_
-/_/_/\__,_/_/ /_/ /_/\__,_/      \__,_/\__, /\___/_/ /_/\__/
-                                      /____/
+ ███  ████  ████  ████  █     █     █████  ███        ____                                                   __
+█   █ █     █     █     █     █       █   █   █      / / /___ _____ ___  ____ _      ____ _____ ____  ____  / /_
+█   █ ███   ███   ███   █     █       █   █   █     / / / __ `/ __ `__ \/ __ `/_____/ __ `/ __ `/ _ \/ __ \/ __/
+█   █ █     █     █     █     █       █   █████    / / / /_/ / / / / / / /_/ /_____/ /_/ / /_/ /  __/ / / / /_
+█   █ █     █     █     █     █       █   █   █   /_/_/\__,_/_/ /_/ /_/\__,_/      \__,_/\__, /\___/_/ /_/\__/
+ ███  █     █     ████  ████  ████  █████ █   █                                         /____/
 )";
 
 static std::atomic<bool> g_is_interrupted = false;
@@ -1361,7 +1361,10 @@ int main(int argc, char ** argv) {
                     ss << "\nNo skills discovered.\n";
                     ss << "Skills are loaded from:\n";
                     ss << "  ./.llama-agent/skills/  (project-local)\n";
+                    ss << "  ./.agents/skills/       (project-local)\n";
                     ss << "  ~/.llama-agent/skills/  (user-global)\n";
+                    ss << "  ~/.agents/skills/       (user-global)\n";
+                    ss << "  <llama-agent>/skills/   (shipped beside the binary)\n";
                 } else {
                     ss << "\nAvailable skills:\n";
                     for (const auto & skill : skills) {

@@ -149,26 +149,19 @@ def test_cors_origins_localhost_rejects(origin: str):
     assert "Access-Control-Allow-Origin" not in res.headers
 
 
-def test_cors_origins_defaults_to_localhost_with_tools_enabled():
+def test_cors_stays_open_when_tools_are_enabled():
     global server
     server = ServerPreset.router()
     server.server_tools = "all"
     server.start()
-    res = server.make_request("OPTIONS", "/completions", headers={
-        "Origin": "http://localhost:8080",
-        "Access-Control-Request-Method": "POST",
-        "Access-Control-Request-Headers": "Authorization",
-    })
-    assert res.status_code == 200
-    assert res.headers["Access-Control-Allow-Origin"] == "http://localhost:8080"
-
-    res = server.make_request("OPTIONS", "/completions", headers={
-        "Origin": "http://evil.com",
-        "Access-Control-Request-Method": "POST",
-        "Access-Control-Request-Headers": "Authorization",
-    })
-    assert res.status_code == 200
-    assert "Access-Control-Allow-Origin" not in res.headers
+    for origin in ("http://localhost:8080", "http://evil.com"):
+        res = server.make_request("OPTIONS", "/completions", headers={
+            "Origin": origin,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "Authorization",
+        })
+        assert res.status_code == 200
+        assert res.headers["Access-Control-Allow-Origin"] == origin
 
 
 def test_cors_proxy_only_forwards_explicit_proxy_headers():

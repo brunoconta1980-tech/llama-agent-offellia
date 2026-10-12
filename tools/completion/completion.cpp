@@ -655,7 +655,7 @@ int llama_completion(int argc, char ** argv) {
 
                 // Display total tokens alongside total time
                 if (params.n_print > 0 && n_past % params.n_print == 0) {
-                    LOG_DBG("\n\033[31mTokens consumed so far = %d / %d \033[0m\n", n_past, n_ctx);
+                    LOG_DBG("\n\033[1;38;2;186;255;186mTokens consumed so far = %d / %d \033[0;38;2;51;255;51m\n", n_past, n_ctx);
                 }
             }
         }

@@ -899,9 +899,9 @@ struct console_printer : public printer {
 
         // Print final status
         if (info.status == test_status_t::OK) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
         fflush(stdout);
     }
@@ -917,9 +917,9 @@ struct console_printer : public printer {
     void print_backend_status(const backend_status_info & info) override {
         printf("  Backend %s: ", info.backend_name.c_str());
         if (info.status == test_status_t::OK) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
     }
 
@@ -949,9 +949,9 @@ struct console_printer : public printer {
     void print_overall_summary(const overall_summary_info & info) override {
         printf("%zu/%zu backends passed\n", info.backends_passed, info.backends_total);
         if (info.all_passed) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
     }
 
@@ -978,9 +978,9 @@ struct console_printer : public printer {
         }
 
         if (result.passed) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
     }
 
@@ -1018,10 +1018,10 @@ struct console_printer : public printer {
                 return buf;
             };
             uint64_t op_flops_per_run = result.flops * result.time_us / 1e6;
-            printf("%s/run - \033[1;34m%sS\033[0m", format_flops(op_flops_per_run).c_str(),
+            printf("%s/run - \033[38;2;40;210;64m%sS\033[0m", format_flops(op_flops_per_run).c_str(),
                    format_flops(result.flops).c_str());
         } else {
-            printf("%8zu kB/run - \033[1;34m%7.2f GB/s\033[0m", result.memory_kb, result.bandwidth_gb_s);
+            printf("%8zu kB/run - \033[38;2;40;210;64m%7.2f GB/s\033[0m", result.memory_kb, result.bandwidth_gb_s);
         }
         printf("\n");
     }
@@ -1031,9 +1031,9 @@ struct console_printer : public printer {
         fflush(stdout);
 
         if (result.supported) {
-            printf("\033[1;32mSUPPORTED\033[0m\n");
+            printf("\033[38;2;51;255;51mSUPPORTED\033[0m\n");
         } else {
-            printf("\033[1;31mNOT SUPPORTED\033[0m\n");
+            printf("\033[1;38;2;186;255;186mNOT SUPPORTED\033[0m\n");
         }
     }
 };

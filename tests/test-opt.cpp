@@ -172,7 +172,7 @@ static void helper_free_ctx_data(struct helper_ctx_data ctx_data) {
 }
 
 static void print_ok(bool subtest_ok) {
-    printf(subtest_ok ? "\033[1;32mOK\033[0m\n" : "\033[1;31mFAIL\033[0m\n");
+    printf(subtest_ok ? "\033[38;2;51;255;51mOK\033[0m\n" : "\033[1;38;2;186;255;186mFAIL\033[0m\n");
 }
 
 static void helper_after_test(
@@ -266,10 +266,10 @@ static std::pair<int, int> test_dataset(
             printf("  %s(shuffle=%s, ndata_shard=%" PRId64 ", ndata_batch=%" PRId64 "): ",
                    __func__, shuffle ? "yes" : "no", ndata_shard, ndata_batch);
             if (subtest_ok) {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 npass++;
             } else {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             }
             ntest++;
         }
@@ -312,10 +312,10 @@ static std::pair<int, int> test_grad(
         }
         printf("  %s(): ", __func__);
         if (subtest_ok) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
             npass++;
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
         ntest++;
     }
@@ -978,13 +978,13 @@ int main(void) {
 
             printf("  Backend %s %s: ", ggml_backend_name(backends[i]), ggml_opt_optimizer_name(optim));
             if (skip) {
-                printf("\033[0;33mSKIPPED\033[0m\n");
+                printf("\033[38;2;40;210;64mSKIPPED\033[0m\n");
                 n_ok++;
             } else if (result.first == result.second) {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 n_ok++;
             } else {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             }
             ++n_total;
             printf("\n");

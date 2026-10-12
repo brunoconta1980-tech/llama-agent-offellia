@@ -3,8 +3,7 @@
 # Asset provisioning priority:
 #   1. Pre-built assets in SRC_DIST_DIR (manually built by user)
 #   2. If BUILD_UI=ON: npm build
-#   3. If above did not produce assets and HF_ENABLED=ON: HF Bucket download
-#      of dist.tar.gz (verified against dist.tar.gz.sha256)
+#   3. External prebuilt download is disabled. HF_ENABLED does not contact the network.
 
 cmake_minimum_required(VERSION 3.18)
 
@@ -76,8 +75,6 @@ function(ui_validate_assets files in_dir)
     set(found_version_json FALSE)
     set(found_bundle_js FALSE)
     set(found_bundle_css FALSE)
-    set(found_workbox_js FALSE)
-
     foreach(f ${files})
         get_filename_component(base "${f}" NAME)
         if(base STREQUAL "index.html")
@@ -94,8 +91,6 @@ function(ui_validate_assets files in_dir)
             set(found_bundle_js TRUE)
         elseif(base MATCHES "^bundle.*\\.css$")
             set(found_bundle_css TRUE)
-        elseif(base MATCHES "^workbox.*\\.js$")
-            set(found_workbox_js TRUE)
         endif()
     endforeach()
 
@@ -120,9 +115,6 @@ function(ui_validate_assets files in_dir)
     endif()
     if(NOT found_bundle_css)
         list(APPEND missing "bundle[hash].css")
-    endif()
-    if(NOT found_workbox_js)
-        list(APPEND missing "workbox[hash].js")
     endif()
 
     if(missing)
@@ -429,92 +421,11 @@ function(resolve_version out_var)
 endfunction()
 
 function(hf_download version out_var out_resolved)
+    # Never fetch a prebuilt UI during compilation. A remote archive plus its
+    # checksum would replace local Vite/web UI changes with an official build.
     set(${out_var}      FALSE PARENT_SCOPE)
     set(${out_resolved} ""    PARENT_SCOPE)
-
-    set(archive "${UI_BINARY_DIR}/dist.tar.gz")
-
-    # Use HF_TOKEN to benefit from higher rate limits
-    set(auth_headers "")
-    if(DEFINED ENV{HF_TOKEN} AND NOT "$ENV{HF_TOKEN}" STREQUAL "")
-        list(APPEND auth_headers "HTTPHEADER" "Authorization: Bearer $ENV{HF_TOKEN}")
-    endif()
-
-    set(candidates "")
-    if(NOT "${version}" STREQUAL "")
-        list(APPEND candidates "${version}")
-    endif()
-    list(APPEND candidates "latest")
-
-    foreach(resolved ${candidates})
-        set(base "https://huggingface.co/buckets/${HF_BUCKET}/resolve/${resolved}")
-
-        message(STATUS "UI: downloading from ${resolved}: ${base}/dist.tar.gz")
-
-        # Fetch the checksum first: when the archive we already have matches
-        # it, the expensive download is skipped and only extraction repeats.
-        file(DOWNLOAD "${base}/dist.tar.gz.sha256?download=true" "${archive}.sha256"
-            STATUS status TIMEOUT 30 ${auth_headers}
-        )
-        list(GET status 0 rc)
-        if(NOT rc EQUAL 0)
-            list(GET status 1 errmsg)
-            message(STATUS "UI: download dist.tar.gz.sha256 from ${resolved} failed: ${errmsg}")
-            continue()
-        endif()
-
-        # Validate the sha256 checksum: reject anything that is not a full
-        # 64-hex-digit digest before touching the archive.
-        file(READ "${archive}.sha256" expected)
-        string(REGEX MATCH "^[0-9a-fA-F]+" expected "${expected}")
-        string(TOLOWER "${expected}" expected)
-        string(LENGTH "${expected}" expected_len)
-        if(NOT expected_len EQUAL 64)
-            message(STATUS "UI: invalid checksum from ${resolved}")
-            continue()
-        endif()
-
-        set(actual "")
-        if(EXISTS "${archive}")
-            file(SHA256 "${archive}" actual)
-        endif()
-
-        if("${actual}" STREQUAL "${expected}")
-            message(STATUS "UI: local dist.tar.gz matches checksum from ${resolved}, skipping download")
-        else()
-            file(DOWNLOAD "${base}/dist.tar.gz?download=true" "${archive}"
-                STATUS status TIMEOUT 300 ${auth_headers}
-            )
-            list(GET status 0 rc)
-            if(NOT rc EQUAL 0)
-                list(GET status 1 errmsg)
-                message(STATUS "UI: download dist.tar.gz from ${resolved} failed: ${errmsg}")
-                continue()
-            endif()
-
-            file(SHA256 "${archive}" actual)
-            if(NOT "${actual}" STREQUAL "${expected}")
-                message(STATUS "UI: checksum mismatch for dist.tar.gz from ${resolved}")
-                continue()
-            endif()
-        endif()
-
-        # Remove the stamp with the dist tree it describes, together.
-        file(REMOVE "${STAMP_FILE}")
-        file(REMOVE_RECURSE "${DIST_DIR}")
-
-        file(ARCHIVE_EXTRACT INPUT "${archive}" DESTINATION "${DIST_DIR}")
-
-        if(NOT EXISTS "${DIST_DIR}/index.html")
-            message(STATUS "UI: archive from ${resolved} is missing required assets")
-            continue()
-        endif()
-
-        message(STATUS "UI: archive verified and extracted")
-        set(${out_var}      TRUE          PARENT_SCOPE)
-        set(${out_resolved} "${resolved}" PARENT_SCOPE)
-        return()
-    endforeach()
+    message(STATUS "UI: external prebuilt download is disabled (version='${version}', no network fetch)")
 endfunction()
 
 # ---------------------------------------------------------------------------
@@ -582,10 +493,7 @@ if(NOT provisioned)
         message(WARNING "UI: provisioning failed; embedding stale assets from ${DIST_DIR}")
     else()
         message(WARNING "UI: no assets available - building without an embedded UI. "
-                        "In a disconnected environment, download the pre-built UI "
-                        "from a llama.cpp release at "
-                        "https://github.com/ggml-org/llama.cpp/releases and "
-                        "extract to tools/ui/dist.")
+                        "Build the local UI with -DLLAMA_BUILD_UI=ON, or place a dist tree at tools/ui/dist.")
     endif()
 endif()
 

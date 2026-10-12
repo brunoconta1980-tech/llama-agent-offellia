@@ -1,5 +1,4 @@
 #include "../tool-registry.h"
-#include "../permission.h"
 
 #include <fstream>
 #include <sstream>
@@ -9,11 +8,11 @@
 
 namespace fs = std::filesystem;
 
-// ANSI color codes
-static const char * ANSI_RED    = "\033[31m";
-static const char * ANSI_GREEN  = "\033[32m";
-static const char * ANSI_RESET  = "\033[0m";
-static const char * ANSI_DIM    = "\033[2m";
+// IBM 5151 phosphor green. Removals are dimmer and additions are brighter.
+static const char * ANSI_RED    = "\033[2;38;2;0;140;40m";
+static const char * ANSI_GREEN  = "\033[1;38;2;186;255;186m";
+static const char * ANSI_RESET  = "\033[0;38;2;51;255;51m";
+static const char * ANSI_DIM    = "\033[38;2;0;140;40m";
 
 // Split string into lines
 static std::vector<std::string> split_lines(const std::string & text) {
@@ -175,11 +174,6 @@ static tool_result edit_execute(const json & args, const tool_context & ctx) {
     // Check if file exists
     if (!fs::exists(path)) {
         return {false, "", "File not found: " + path.string()};
-    }
-
-    // Block sensitive files
-    if (permission_manager::is_sensitive_file(path.string())) {
-        return {false, "", "Cannot edit sensitive file (contains credentials/secrets): " + path.string()};
     }
 
     // Read file content

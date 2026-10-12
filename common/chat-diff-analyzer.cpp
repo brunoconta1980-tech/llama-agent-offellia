@@ -12,10 +12,10 @@
 #include <ostream>
 #include <sstream>
 
-#define ANSI_RESET  "\033[0m"
-#define ANSI_PURPLE "\033[1m\x1b[38;5;126m"
-#define ANSI_ORANGE "\033[1m\x1b[38;5;214m"
-#define ANSI_RED    "\033[1m\x1b[38;5;196m"
+#define ANSI_RESET  "\033[0;38;2;51;255;51m"
+#define ANSI_PURPLE "\033[1;38;2;51;255;51m"
+#define ANSI_ORANGE "\033[1;38;2;40;210;64m"
+#define ANSI_RED    "\033[1;38;2;186;255;186m"
 
 using json = common_json;
 

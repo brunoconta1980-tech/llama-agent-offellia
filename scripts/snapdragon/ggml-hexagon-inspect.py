@@ -678,10 +678,10 @@ def annotate_disasm_line(
             tgt = f"({base})" if base not in ("r29", "r30") else ""
             if in_loop:
                 tag = f"[V-SPILL:{op}{tgt}:IN-LOOP]"
-                tags.append(f"\033[1;31m{tag}\033[0m" if use_color else tag)
+                tags.append(f"\033[1;38;2;186;255;186m{tag}\033[0m" if use_color else tag)
             else:
                 tag = f"[V-SPILL:{op}{tgt}]"
-                tags.append(f"\033[1;33m{tag}\033[0m" if use_color else tag)
+                tags.append(f"\033[1;38;2;40;210;64m{tag}\033[0m" if use_color else tag)
             is_event = True
 
         sm = RE_SMEM_BASE.search(insn)
@@ -692,10 +692,10 @@ def annotate_disasm_line(
             tgt = f"({base})" if base not in ("r29", "r30") else ""
             if in_loop:
                 tag = f"[S-SPILL:{op}{tgt}:IN-LOOP]"
-                tags.append(f"\033[1;35m{tag}\033[0m" if use_color else tag)
+                tags.append(f"\033[1;38;2;51;255;51m{tag}\033[0m" if use_color else tag)
             else:
                 tag = f"[S-SPILL:{op}{tgt}]"
-                tags.append(f"\033[0;35m{tag}\033[0m" if use_color else tag)
+                tags.append(f"\033[38;2;51;255;51m{tag}\033[0m" if use_color else tag)
             is_event = True
 
     prom_m = RE_PROMOTION_CALL.search(asm_chunk)
@@ -704,28 +704,28 @@ def annotate_disasm_line(
         ptarget = prom_m.group(1)
         if in_loop:
             tag = f"[PROMOTION:{ptarget}:IN-LOOP]"
-            tags.append(f"\033[1;31m{tag}\033[0m" if use_color else tag)
+            tags.append(f"\033[1;38;2;186;255;186m{tag}\033[0m" if use_color else tag)
         else:
             tag = f"[PROMOTION:{ptarget}]"
-            tags.append(f"\033[1;35m{tag}\033[0m" if use_color else tag)
+            tags.append(f"\033[1;38;2;51;255;51m{tag}\033[0m" if use_color else tag)
         is_event = True
     elif swdiv_m:
         dtarget = swdiv_m.group(1)
         if in_loop:
             tag = f"[SW-DIV:{dtarget}:IN-LOOP]"
-            tags.append(f"\033[1;31m{tag}\033[0m" if use_color else tag)
+            tags.append(f"\033[1;38;2;186;255;186m{tag}\033[0m" if use_color else tag)
         else:
             tag = f"[SW-DIV:{dtarget}]"
-            tags.append(f"\033[1;35m{tag}\033[0m" if use_color else tag)
+            tags.append(f"\033[1;38;2;51;255;51m{tag}\033[0m" if use_color else tag)
         is_event = True
     elif RE_ANY_CALL.search(asm_chunk):
         if in_loop:
             tag = "[CALL:IN-LOOP]"
-            tags.append(f"\033[1;31m{tag}\033[0m" if use_color else tag)
+            tags.append(f"\033[1;38;2;186;255;186m{tag}\033[0m" if use_color else tag)
             is_event = True
         else:
             tag = "[CALL]"
-            tags.append(f"\033[1;36m{tag}\033[0m" if use_color else tag)
+            tags.append(f"\033[38;2;40;210;64m{tag}\033[0m" if use_color else tag)
 
     if ":endloop0" in asm_chunk:
         tags.append("[LOOP0-END]")
@@ -829,16 +829,16 @@ def run_spills(
 
         notes = ""
         if f.vspills_in_loop_st > 0 and f.vspills_in_loop_ld > 0:
-            notes = "\033[1;31m[V-ROUNDTRIP!]\033[0m" if use_color else "[V-ROUNDTRIP!]"
+            notes = "\033[1;38;2;186;255;186m[V-ROUNDTRIP!]\033[0m" if use_color else "[V-ROUNDTRIP!]"
         elif f.vspills_in_loop_st == 0 and f.vspills_in_loop_ld > 0:
             notes = "v-readonly"
 
         vloop_str = f"{vloop_detail:>14}"
         if f.vspills_in_loop > 0 and use_color:
             if f.vspills_in_loop_st > 0 and f.vspills_in_loop_ld > 0:
-                vloop_str = f"\033[1;31m{vloop_str}\033[0m"
+                vloop_str = f"\033[1;38;2;186;255;186m{vloop_str}\033[0m"
             else:
-                vloop_str = f"\033[1;33m{vloop_str}\033[0m"
+                vloop_str = f"\033[1;38;2;40;210;64m{vloop_str}\033[0m"
 
         sloop_str = f"{sloop_detail:>14}"
 
@@ -858,7 +858,7 @@ def run_spills(
         logger.info("\n" + "=" * 50)
         if strict_violations:
             if use_color:
-                logger.error("\033[1;31mSTRICT CHECK FAILED\033[0m")
+                logger.error("\033[1;38;2;186;255;186mSTRICT CHECK FAILED\033[0m")
             else:
                 logger.error("STRICT CHECK FAILED")
             for v in strict_violations:
@@ -867,7 +867,7 @@ def run_spills(
             return 1
         else:
             if use_color:
-                logger.info("\033[1;32mSTRICT CHECK PASSED: 0 violations\033[0m")
+                logger.info("\033[38;2;51;255;51mSTRICT CHECK PASSED: 0 violations\033[0m")
             else:
                 logger.info("STRICT CHECK PASSED: 0 violations")
             logger.info("=" * 50)
@@ -935,7 +935,7 @@ def run_promotions(
 
         inloop_str = f"{f.promotions_in_loop:>7}"
         if f.promotions_in_loop > 0 and use_color:
-            inloop_str = f"\033[1;31m{inloop_str}\033[0m"
+            inloop_str = f"\033[1;38;2;186;255;186m{inloop_str}\033[0m"
 
         targets_str = ", ".join(f"{t}: {c}" for t, c in sorted(f.promotion_targets.items()))
         logger.info(
@@ -953,7 +953,7 @@ def run_promotions(
         logger.info("\n" + "=" * 50)
         if strict_violations:
             if use_color:
-                logger.error("\033[1;31mSTRICT CHECK FAILED\033[0m")
+                logger.error("\033[1;38;2;186;255;186mSTRICT CHECK FAILED\033[0m")
             else:
                 logger.error("STRICT CHECK FAILED")
             for v in strict_violations:
@@ -962,7 +962,7 @@ def run_promotions(
             return 1
         else:
             if use_color:
-                logger.info("\033[1;32mSTRICT CHECK PASSED: 0 violations\033[0m")
+                logger.info("\033[38;2;51;255;51mSTRICT CHECK PASSED: 0 violations\033[0m")
             else:
                 logger.info("STRICT CHECK PASSED: 0 violations")
             logger.info("=" * 50)
@@ -1031,7 +1031,7 @@ def run_swdiv(
 
         inloop_str = f"{f.swdivs_in_loop:>7}"
         if f.swdivs_in_loop > 0 and use_color:
-            inloop_str = f"\033[1;31m{inloop_str}\033[0m"
+            inloop_str = f"\033[1;38;2;186;255;186m{inloop_str}\033[0m"
 
         # Several calls can share a source line; list each location once
         locs = [site_chains[a][-1] if a in site_chains else f"+0x{a - f.address:x}" for a, _, _ in f.swdiv_sites]
@@ -1047,7 +1047,7 @@ def run_swdiv(
                 chain = " <- ".join(site_chains.get(a, ["?"]))
                 loop_tag = " [IN-LOOP]" if in_loop else ""
                 if in_loop and use_color:
-                    loop_tag = f"\033[1;31m{loop_tag}\033[0m"
+                    loop_tag = f"\033[1;38;2;186;255;186m{loop_tag}\033[0m"
                 off = f"+0x{a - f.address:x}"
                 logger.info(f"    {off:<8} {re.sub(r'^__hexagon_', '', helper):<{helper_w}}  {chain}{loop_tag}")
 
@@ -1145,11 +1145,11 @@ def run_disasm(
                 sspill_str = f"{loop.sspills_total} ({loop.sspills_st}s,{loop.sspills_ld}l)"
                 notes = []
                 if loop.has_v_roundtrip:
-                    notes.append("\033[1;31m[V-ROUNDTRIP!]\033[0m" if use_color else "[V-ROUNDTRIP!]")
+                    notes.append("\033[1;38;2;186;255;186m[V-ROUNDTRIP!]\033[0m" if use_color else "[V-ROUNDTRIP!]")
                 elif loop.vspills_st == 0 and loop.vspills_ld > 0:
                     notes.append("v-readonly")
                 if loop.vec_density >= 1.5:
-                    notes.append("\033[1;32mdual-hvx\033[0m" if use_color else "dual-hvx")
+                    notes.append("\033[38;2;51;255;51mdual-hvx\033[0m" if use_color else "dual-hvx")
                 notes_str = ", ".join(notes)
                 logger.info(
                     f"{loop.loop_id:<3} | {loop.loop_type:<5} | {f'0x{loop.start_addr:08x} - 0x{loop.end_addr:08x}':<23} | "

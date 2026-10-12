@@ -57,13 +57,18 @@ tool_result agent_loop::execute_tool_call(const common_chat_tool_call & call) {
                 ext_req.type = permission_type::EXTERNAL_DIR;
                 ext_req.tool_name = call.name;
                 ext_req.details = "External file: " + path.string();
-                ext_req.is_dangerous = true;
                 ext_req.description = "Operation outside working directory";
 
-                auto response = permission_mgr_.prompt_user(ext_req);
-                if (response == permission_response::DENY_ONCE ||
-                    response == permission_response::DENY_ALWAYS) {
+                permission_state ext_state = permission_mgr_.check_permission(ext_req);
+                if (ext_state == permission_state::DENY || ext_state == permission_state::DENY_SESSION) {
                     return tool_error("Blocked: File is outside working directory");
+                }
+                if (ext_state == permission_state::ASK) {
+                    auto response = permission_mgr_.prompt_user(ext_req);
+                    if (response == permission_response::DENY_ONCE ||
+                        response == permission_response::DENY_ALWAYS) {
+                        return tool_error("Blocked: File is outside working directory");
+                    }
                 }
             }
         }
@@ -74,18 +79,6 @@ tool_result agent_loop::execute_tool_call(const common_chat_tool_call & call) {
         std::string cmd = args.value("command", "");
         req.details = cmd;
         req.is_dangerous = permission_mgr_.is_dangerous_bash_command(cmd);
-    }
-
-    // Check doom loop
-    std::hash<std::string> hasher;
-    std::string args_hash = std::to_string(hasher(call.arguments));
-    if (permission_mgr_.is_doom_loop(call.name, args_hash)) {
-        req.description = "Detected repeated identical tool calls (doom loop)";
-        auto response = permission_mgr_.prompt_user(req);
-        if (response == permission_response::DENY_ONCE ||
-            response == permission_response::DENY_ALWAYS) {
-            return tool_error("Blocked: Detected repeated identical tool calls");
-        }
     }
 
     // Check permission
@@ -101,9 +94,6 @@ tool_result agent_loop::execute_tool_call(const common_chat_tool_call & call) {
             return tool_error("User denied permission for " + call.name);
         }
     }
-
-    // Record this call
-    permission_mgr_.record_tool_call(call.name, args_hash);
 
     // Display tool execution
     console::set_display(DISPLAY_TYPE_INFO);

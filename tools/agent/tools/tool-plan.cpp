@@ -4,11 +4,11 @@
 #include <string>
 
 // ANSI color/style codes (same convention as tool-edit.cpp)
-static const char * ANSI_BOLD   = "\033[1m";
-static const char * ANSI_GREEN  = "\033[32m";
-static const char * ANSI_YELLOW = "\033[33m";
-static const char * ANSI_DIM    = "\033[2m";
-static const char * ANSI_RESET  = "\033[0m";
+static const char * ANSI_BOLD   = "\033[1;38;2;186;255;186m";
+static const char * ANSI_GREEN  = "\033[38;2;51;255;51m";
+static const char * ANSI_YELLOW = "\033[1;38;2;40;210;64m";
+static const char * ANSI_DIM    = "\033[38;2;0;140;40m";
+static const char * ANSI_RESET  = "\033[0;38;2;51;255;51m";
 
 // UTF-8 emoji sequences
 static const char * ICON_COMPLETED   = "\xe2\x9c\x85"; // ✅

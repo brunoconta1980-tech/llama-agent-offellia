@@ -301,7 +301,7 @@ int main(int argc, char ** argv) {
                     LOG("%s", token_str.c_str());
                 } else {
                     // print light cyan
-                    LOG("\033[0;96m%s\033[0m", token_str.c_str());
+                    LOG("\033[1;38;2;40;210;64m%s\033[0;38;2;51;255;51m", token_str.c_str());
                 }
                 fflush(stdout);
 

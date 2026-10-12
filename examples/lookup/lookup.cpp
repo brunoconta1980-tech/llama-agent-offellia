@@ -163,7 +163,7 @@ int main(int argc, char ** argv){
 
                 if (params.use_color) {
                     // color accepted draft token
-                    LOG("\033[34m%s\033[0m", token_str.c_str());
+                    LOG("\033[1;38;2;186;255;186m%s\033[0;38;2;51;255;51m", token_str.c_str());
                     fflush(stdout);
                 }
                 continue;

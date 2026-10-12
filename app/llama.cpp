@@ -23,21 +23,14 @@ int llama_quantize(int argc, char ** argv);
 int llama_perplexity(int argc, char ** argv);
 int llama_download(int argc, char ** argv);
 
-// Self-update is only supported for binaries built with llama-install.sh
+// Automatic updates are disabled. This command must not contact an update server
+// or execute a remote installer.
 static int llama_update(int argc, char ** argv) {
     (void) argc;
     (void) argv;
 
-#ifdef LLAMA_INSTALL_BUILD
-#if defined(_WIN32)
-    return system("powershell -NoProfile -ExecutionPolicy Bypass -Command \"irm https://llama.app/install.ps1 | iex\"");
-#else
-    return system("curl -fsSL https://llama.app/install.sh | sh");
-#endif
-#else
-    printf("Updates are available only when installed from https://llama.app\n");
-    return 1;
-#endif
+    printf("Automatic updates are disabled. This build does not contact external update servers.\n");
+    return 0;
 }
 
 static const char * progname;
@@ -55,16 +48,10 @@ struct command {
     bool flags = false; // allow --name
 };
 
-#ifdef LLAMA_INSTALL_BUILD
-#define UPDATE_HIDDEN false
-#else
-#define UPDATE_HIDDEN true
-#endif
-
 static const command cmds[] = {
     {"serve",         "HTTP API server",                                    {"server"},   false,         llama_server       },
     {"cli",           "Command-line interactive interface",                 {"client"},   false,         llama_cli          },
-    {"update",        "Update llama to the latest release",                 {},           UPDATE_HIDDEN, llama_update       },
+    {"update",        "Automatic updates are disabled",                     {},           false,         llama_update       },
     {"download",      "Download a model",                                   {"get"},      false,         llama_download     },
     {"completion",    "Text completion",                                    {"complete"}, true,          llama_completion   },
     {"bench",         "Benchmark prompt processing and text generation",    {},           true,          llama_bench        },
@@ -76,8 +63,6 @@ static const command cmds[] = {
     {"licenses",      "Show third-party licenses",                          {"credits"},  false,         licenses,          true },
     {"help",          "Show available commands",                            {},           false,         help,              true },
 };
-
-#undef UPDATE_HIDDEN
 
 static int version(int /*argc*/, char ** /*argv*/) {
     llama_print_build_info(llama_version(), stdout);

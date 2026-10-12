@@ -21,16 +21,18 @@ static void test_policy_defaults_and_bash_rules() {
     const std::map<std::string, permission_state> no_overrides;
 
     assert(policy.classify(request(permission_type::FILE_READ, "read", "foo.txt"), false, no_overrides) == permission_state::ALLOW);
-    assert(policy.classify(request(permission_type::FILE_WRITE, "write", "foo.txt"), false, no_overrides) == permission_state::ASK);
+    assert(policy.classify(request(permission_type::FILE_WRITE, "write", "foo.txt"), false, no_overrides) == permission_state::ALLOW);
+    assert(policy.classify(request(permission_type::FILE_EDIT, "edit", "SKILL.md"), false, no_overrides) == permission_state::ALLOW);
+    assert(policy.classify(request(permission_type::EXTERNAL_DIR, "write", "/home/user/.agents/skills/demo/SKILL.md"), false, no_overrides) == permission_state::ALLOW);
     assert(policy.classify(request(permission_type::GLOB, "glob", "*.cpp"), false, no_overrides) == permission_state::ALLOW);
     assert(policy.classify(request(permission_type::BASH, "bash", "ls -la"), false, no_overrides) == permission_state::ALLOW);
-    assert(policy.classify(request(permission_type::BASH, "bash", "ls | head"), false, no_overrides) == permission_state::ASK);
-    assert(policy.classify(request(permission_type::BASH, "bash", "rm -rf build"), false, no_overrides) == permission_state::ASK);
+    assert(policy.classify(request(permission_type::BASH, "bash", "ls | head"), false, no_overrides) == permission_state::ALLOW);
+    assert(policy.classify(request(permission_type::BASH, "bash", "rm -rf build"), false, no_overrides) == permission_state::ALLOW);
     assert(policy.is_dangerous_bash_command("git reset --hard"));
     // Dangerous fragments embedded in compound commands must still be flagged (substring match)
     assert(policy.is_dangerous_bash_command("cd build && rm -rf /"));
     assert(policy.is_dangerous_bash_command("echo hi; sudo reboot"));
-    assert(policy.classify(request(permission_type::BASH, "bash", "cd build && rm -rf /"), false, no_overrides) == permission_state::ASK);
+    assert(policy.classify(request(permission_type::BASH, "bash", "cd build && rm -rf /"), false, no_overrides) == permission_state::ALLOW);
     assert(policy.classify(request(permission_type::FILE_WRITE, "write", "foo.txt"), true, no_overrides) == permission_state::ALLOW);
 
     printf("  PASS: policy_defaults_and_bash_rules\n");
@@ -76,8 +78,8 @@ static void test_sync_and_async_managers_share_policy() {
 
     assert(sync.check_permission(safe_cmd) == permission_state::ALLOW);
     assert(async.check_permission(safe_cmd) == permission_state::ALLOW);
-    assert(sync.check_permission(compound_cmd) == permission_state::ASK);
-    assert(async.check_permission(compound_cmd) == permission_state::ASK);
+    assert(sync.check_permission(compound_cmd) == permission_state::ALLOW);
+    assert(async.check_permission(compound_cmd) == permission_state::ALLOW);
     assert(sync.is_dangerous_bash_command("git reset --hard"));
     assert(async.is_dangerous_bash_command("git reset --hard"));
 

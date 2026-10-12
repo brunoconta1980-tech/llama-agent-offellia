@@ -104,6 +104,26 @@ if(LLAMA_TOOLS_INSTALL)
     install(TARGETS ${TARGET} RUNTIME)
 endif()
 
+# Skills are not compiled into the binary. Copy them next to it so a finished
+# llama-agent finds <exe_dir>/skills without a separate install step.
+function(agent_bundle_skills tgt)
+    add_custom_command(TARGET ${tgt} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/bundled-skills"
+            "$<TARGET_FILE_DIR:${tgt}>/skills"
+        COMMENT "Copy bundled skills next to ${tgt}"
+        VERBATIM)
+endfunction()
+
+agent_bundle_skills(${TARGET})
+
+if(LLAMA_TOOLS_INSTALL)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bundled-skills/"
+        DESTINATION "${LLAMA_BIN_INSTALL_DIR}/skills"
+        USE_SOURCE_PERMISSIONS
+        PATTERN "*.pyc" EXCLUDE)
+endif()
+
 # llama-agent-server (HTTP API for agent)
 if(LLAMA_HTTPLIB)
     set(AGENT_SERVER_TARGET llama-agent-server)
@@ -130,6 +150,8 @@ if(LLAMA_HTTPLIB)
     if(WIN32)
         target_link_libraries(${AGENT_SERVER_TARGET} PRIVATE ws2_32)
     endif()
+
+    agent_bundle_skills(${AGENT_SERVER_TARGET})
 
     if(LLAMA_TOOLS_INSTALL)
         install(TARGETS ${AGENT_SERVER_TARGET} RUNTIME)

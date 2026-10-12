@@ -58,25 +58,28 @@ tool_result agent_loop::execute_tool_call_async(
                 ext_req.type = permission_type::EXTERNAL_DIR;
                 ext_req.tool_name = call.name;
                 ext_req.details = "External file: " + path.string();
-                ext_req.is_dangerous = true;
                 ext_req.description = "Operation outside working directory";
 
-                // Request permission asynchronously
-                std::string req_id = async_perms.request_permission(ext_req);
-                on_event(agent_event::permission_required(
-                    req_id, call.name, ext_req.description, ext_req.details, true));
-
-                // Wait for response (cancellable via should_stop)
-                auto response = async_perms.wait_for_response_or_stop(req_id, 300000, should_stop);
-                if (should_stop()) {
-                    on_event(agent_event::permission_resolved(req_id, false));
-                    return {false, "", "Operation cancelled"};
-                }
-                if (!response || !response->allowed) {
-                    on_event(agent_event::permission_resolved(req_id, false));
+                permission_state ext_state = async_perms.check_permission(ext_req);
+                if (ext_state == permission_state::DENY || ext_state == permission_state::DENY_SESSION) {
                     return {false, "", "Blocked: File is outside working directory"};
                 }
-                on_event(agent_event::permission_resolved(req_id, true));
+                if (ext_state == permission_state::ASK) {
+                    std::string req_id = async_perms.request_permission(ext_req);
+                    on_event(agent_event::permission_required(
+                        req_id, call.name, ext_req.description, ext_req.details, false));
+
+                    auto response = async_perms.wait_for_response_or_stop(req_id, 300000, should_stop);
+                    if (should_stop()) {
+                        on_event(agent_event::permission_resolved(req_id, false));
+                        return {false, "", "Operation cancelled"};
+                    }
+                    if (!response || !response->allowed) {
+                        on_event(agent_event::permission_resolved(req_id, false));
+                        return {false, "", "Blocked: File is outside working directory"};
+                    }
+                    on_event(agent_event::permission_resolved(req_id, true));
+                }
             }
         }
     }
@@ -86,27 +89,6 @@ tool_result agent_loop::execute_tool_call_async(
         std::string cmd = args.value("command", "");
         req.details = cmd;
         req.is_dangerous = async_perms.is_dangerous_bash_command(cmd);
-    }
-
-    // Check doom loop
-    std::hash<std::string> hasher;
-    std::string args_hash = std::to_string(hasher(call.arguments));
-    if (async_perms.is_doom_loop(call.name, args_hash)) {
-        req.description = "Detected repeated identical tool calls (doom loop)";
-
-        std::string req_id = async_perms.request_permission(req);
-        on_event(agent_event::permission_required(req_id, call.name, req.description, req.details, true));
-
-        auto response = async_perms.wait_for_response_or_stop(req_id, 300000, should_stop);
-        if (should_stop()) {
-            on_event(agent_event::permission_resolved(req_id, false));
-            return {false, "", "Operation cancelled"};
-        }
-        if (!response || !response->allowed) {
-            on_event(agent_event::permission_resolved(req_id, false));
-            return {false, "", "Blocked: Detected repeated identical tool calls"};
-        }
-        on_event(agent_event::permission_resolved(req_id, true));
     }
 
     // Check permission
@@ -140,9 +122,6 @@ tool_result agent_loop::execute_tool_call_async(
             return {false, "", "User denied permission for " + call.name};
         }
     }
-
-    // Record this call
-    async_perms.record_tool_call(call.name, args_hash);
 
     // Execute the tool
     return registry.execute(call.name, args, tool_ctx_);

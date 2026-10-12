@@ -29,6 +29,40 @@
 
 int common_log_verbosity_thold = LOG_DEFAULT_LLAMA;
 
+// Paint interactive consoles with the same phosphor green as LOG_COL_DEFAULT.
+// Pipes are left alone. The terminal default is restored when the process ends.
+static bool phosphor_latched = false;
+
+static void phosphor_paint_ttys() {
+    if (isatty(fileno(stdout))) {
+        fputs(LOG_COL_DEFAULT, stdout);
+        fflush(stdout);
+    }
+    if (isatty(fileno(stderr))) {
+        fputs(LOG_COL_DEFAULT, stderr);
+        fflush(stderr);
+    }
+}
+
+static void phosphor_restore_ttys() {
+    if (isatty(fileno(stdout))) {
+        fputs("\033[0m", stdout);
+        fflush(stdout);
+    }
+    if (isatty(fileno(stderr))) {
+        fputs("\033[0m", stderr);
+        fflush(stderr);
+    }
+}
+
+static void phosphor_arm() {
+    phosphor_paint_ttys();
+    if (!phosphor_latched) {
+        phosphor_latched = true;
+        std::atexit(phosphor_restore_ttys);
+    }
+}
+
 int common_log_get_verbosity_thold(void) {
     return common_log_verbosity_thold;
 }
@@ -420,9 +454,13 @@ public:
             g_col[COMMON_LOG_COL_MAGENTA] = LOG_COL_MAGENTA;
             g_col[COMMON_LOG_COL_CYAN]    = LOG_COL_CYAN;
             g_col[COMMON_LOG_COL_WHITE]   = LOG_COL_WHITE;
+            phosphor_arm();
         } else {
             for (size_t i = 0; i < std::size(g_col); i++) {
                 g_col[i] = "";
+            }
+            if (phosphor_latched) {
+                phosphor_restore_ttys();
             }
         }
 

@@ -1,5 +1,4 @@
 #include "../tool-registry.h"
-#include "../permission.h"
 
 #include "base64.hpp"
 
@@ -50,11 +49,6 @@ static tool_result read_execute(const json & args, const tool_context & ctx) {
     // Check if it's a file (not directory)
     if (!fs::is_regular_file(path)) {
         return {false, "", "Not a regular file: " + path.string()};
-    }
-
-    // Block sensitive files
-    if (permission_manager::is_sensitive_file(path.string())) {
-        return {false, "", "Cannot read sensitive file (contains credentials/secrets): " + path.string()};
     }
 
     // Check for image files

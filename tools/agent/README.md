@@ -204,12 +204,15 @@ Skills are reusable prompt modules that extend the agent's capabilities. They fo
 | `--no-skills` | Disable skill discovery |
 | `--skills-path PATH` | Add custom skills directory |
 
-Skills are discovered from:
+Skills are discovered from (first match wins when the same name appears twice):
 1. `./.llama-agent/skills/` - Project-local skills
 2. `./.agents/skills/` - Project-local skills (alternative path)
 3. `~/.llama-agent/skills/` - User-global skills
 4. `~/.agents/skills/` - User-global skills (alternative path)
-5. Custom paths via `--skills-path`
+5. `<directory of the llama-agent binary>/skills/` - Skills copied beside the binary when it is built
+6. Custom paths via `--skills-path`
+
+Building `llama-agent` copies `tools/agent/bundled-skills/` to `build/bin/skills/`. `llama-agent-server` uses the same directory. A skill in the project or user directory overrides a shipped skill of the same name.
 
 <details>
 <summary><strong>Creating a skill</strong></summary>
@@ -379,24 +382,14 @@ MCP tools are registered with qualified names: `mcp__<server>__<tool>`. For exam
 
 ## Permission System
 
-The agent asks for confirmation before:
-- Running shell commands
-- Writing or editing files
-- Accessing files outside the working directory
+Shell commands, file writes, file edits, paths outside the working directory, credential files, and repeated identical tool calls are allowed. That includes creating skills and `AGENTS.md` under the project or in `~/.agents/skills`.
 
-When prompted: `y` (yes), `n` (no), `a` (always allow), `d` (deny always)
+A session can still record an explicit deny. `--yolo` remains available and has the same effect as the default allow policy.
 
 | Flag | Description |
 |------|-------------|
-| `--yolo` | Skip all permission prompts (dangerous!) |
+| `--yolo` | Skip all permission prompts |
 | `--max-iterations N` | Max agent iterations (default: unlimited) |
-
-### Safety Features
-
-- **Sensitive file blocking**: Automatically blocks access to `.env`, `*.key`, `*.pem`, credentials files
-- **External directory warnings**: Prompts before accessing files outside the project
-- **Dangerous command detection**: Warns for `rm -rf`, `sudo`, `curl|bash`, etc.
-- **Doom-loop detection**: Detects and blocks repeated identical tool calls
 
 > [!CAUTION]
 > **YOLO mode is extremely dangerous.** The agent will execute any command without confirmation, including destructive operations like `rm -rf`. This is especially risky with smaller models that have weaker instruction-following and may hallucinate unsafe commands. Only use this flag if you fully trust the model and understand the risks.
@@ -538,7 +531,7 @@ data: {"reason":"completed","stats":{"input_tokens":1500,"output_tokens":200}}
 
 **Permission Flow**
 
-When `yolo: false`, dangerous operations require permission:
+Shell, writes, edits, and paths outside the working directory are allowed without a prompt. A `permission_required` event is emitted only when this session already stored an explicit deny:
 
 ```
 event: permission_required

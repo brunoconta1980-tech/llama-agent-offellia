@@ -192,9 +192,9 @@ for i in "${!arr_hf[@]}"; do
     if [ "$USE_VIDEO" = true ]; then
         # for video, only check exit code; do not grep for "new york"
         if [ $exit_code -eq 0 ]; then
-            result="$prefix \033[32mOK\033[0m:   $hf"
+            result="$prefix \033[38;2;51;255;51mOK\033[0m:   $hf"
         else
-            result="$prefix \033[31mFAIL\033[0m: $hf"
+            result="$prefix \033[1;38;2;186;255;186mFAIL\033[0m: $hf"
         fi
         # append generated text (after the response marker)
         generated_text=$(echo "$output" | sed "1,/${MTMD_TEST_RESPONSE_MARKER}/d" | tail -10)
@@ -207,9 +207,9 @@ for i in "${!arr_hf[@]}"; do
         if echo "$output" | grep -iq "new york" \
                 || (echo "$output" | grep -iq "men" && echo "$output" | grep -iq "walk")
         then
-            result="$prefix \033[32mOK\033[0m:   $hf"
+            result="$prefix \033[38;2;51;255;51mOK\033[0m:   $hf"
         else
-            result="$prefix \033[31mFAIL\033[0m: $hf"
+            result="$prefix \033[1;38;2;186;255;186mFAIL\033[0m: $hf"
         fi
         echo -e "$result"
     fi

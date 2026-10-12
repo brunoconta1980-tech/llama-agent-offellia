@@ -3,7 +3,7 @@ import {
 	padFaviconSvg,
 	writeThemeFavicons
 } from '../../scripts/favicon-colorize';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -207,5 +207,31 @@ describe('writeThemeFavicons', () => {
 
 		// source file is not modified by the padding step
 		expect(readFileSync(sourcePath, 'utf-8')).toBe(LOGO);
+	});
+
+	it('keeps a favicon that was modified after the source logo', () => {
+		const { darkPath, lightPath, sourcePath } = setupSource();
+		const customLight = '<svg id="custom-light"></svg>';
+		const customDark = '<svg id="custom-dark"></svg>';
+
+		writeFileSync(lightPath, customLight);
+		writeFileSync(darkPath, customDark);
+
+		const older = new Date(Date.now() - 60_000);
+		const newer = new Date(Date.now() + 60_000);
+
+		utimesSync(sourcePath, older, older);
+		utimesSync(lightPath, newer, newer);
+		utimesSync(darkPath, newer, newer);
+
+		writeThemeFavicons('#111111', '#fafafa', {
+			darkOutPath: darkPath,
+			lightOutPath: lightPath,
+			padding: 0.04,
+			sourcePath
+		});
+
+		expect(readFileSync(lightPath, 'utf-8')).toBe(customLight);
+		expect(readFileSync(darkPath, 'utf-8')).toBe(customDark);
 	});
 });

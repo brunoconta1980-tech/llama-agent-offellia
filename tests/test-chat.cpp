@@ -1452,7 +1452,7 @@ static void test_peg_parser(common_chat_templates *                      tmpls,
             size_t ctx_start = diff_pos > 60 ? diff_pos - 60 : 0;
             size_t ctx_end_e = std::min(expected_text.size(), diff_pos + 40);
             size_t ctx_end_r = std::min(reconstruction_params.prompt.size(), diff_pos + 40);
-            LOG_ERR("\x1b[31m[RECONSTRUCTION FAIL]\x1b[0m "
+            LOG_ERR("\x1b[1;38;2;186;255;186m[RECONSTRUCTION FAIL]\x1b[0m "
                     "first diff at byte %zu (expected len=%zu, reconstructed len=%zu)\n"
                     "  expected:      ...%s...\n"
                     "  reconstructed: ...%s...\n",
@@ -1466,7 +1466,7 @@ static void test_peg_parser(common_chat_templates *                      tmpls,
                 "\n\n>>> Reconstructed:\n" + reconstruction_params.prompt;
             throw std::runtime_error(error_msg);
         } else if (g_force_reconstruction_test) {
-            LOG_INF("\x1b[32m[RECONSTRUCTION OK]\x1b[0m\n");
+            LOG_INF("\x1b[38;2;51;255;51m[RECONSTRUCTION OK]\x1b[0m\n");
         }
     }
 }
@@ -1593,7 +1593,7 @@ class peg_test_builder {
                 return;
             }
         }
-        LOG_INF("\n\x1b[38;5;126m[%s]\x1b[0m\n%s\n\n", tester_.template_path().c_str(), tc_.input.c_str());
+        LOG_INF("\n\x1b[38;2;51;255;51m[%s]\x1b[0m\n%s\n\n", tester_.template_path().c_str(), tc_.input.c_str());
         test_peg_parser(tester_.tmpls_.get(), [this](peg_test_case & t) { t = tc_; }, tester_.detailed_debug_);
     }
 };

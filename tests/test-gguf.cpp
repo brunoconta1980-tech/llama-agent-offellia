@@ -828,19 +828,19 @@ static std::pair<int, int> test_handcrafted_file(const unsigned int seed) {
             printf("%s:   - context_null: ", __func__);
         }
         if (bool(gguf_ctx) == expect_context_not_null(hft)) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
             npass++;
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
         ntest++;
 
         if (hft >= offset_has_data && !expect_context_not_null(hft)) {
             printf("%s:   - no_dangling_ggml_context_pointer: ", __func__);
             if (ctx) {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             } else {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 npass++;
             }
             ntest++;
@@ -851,10 +851,10 @@ static std::pair<int, int> test_handcrafted_file(const unsigned int seed) {
         if (expect_context_not_null(hft)) {
             printf("%s:   - check_header: ", __func__);
             if (handcrafted_check_header(gguf_ctx, seed, hft >= offset_has_kv, hft >= offset_has_tensors, alignment_defined)) {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 npass++;
             } else {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             }
             ntest++;
         }
@@ -862,10 +862,10 @@ static std::pair<int, int> test_handcrafted_file(const unsigned int seed) {
         if (expect_context_not_null(hft) && hft >= offset_has_kv) {
             printf("%s:   - check_kv: ", __func__);
             if (handcrafted_check_kv(gguf_ctx, seed, hft >= offset_has_tensors, alignment_defined)) {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 npass++;
             } else {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             }
             ntest++;
         }
@@ -875,10 +875,10 @@ static std::pair<int, int> test_handcrafted_file(const unsigned int seed) {
         if (expect_context_not_null(hft) && hft >= offset_has_tensors && hft != HANDCRAFTED_TENSORS_ZERO_DIM) {
             printf("%s:   - check_tensors: ", __func__);
             if (handcrafted_check_tensors(gguf_ctx, seed)) {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 npass++;
             } else {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             }
             ntest++;
         }
@@ -886,10 +886,10 @@ static std::pair<int, int> test_handcrafted_file(const unsigned int seed) {
         if (expect_context_not_null(hft) && hft >= offset_has_data) {
             printf("%s:   - check_tensor_data: ", __func__);
             if (handcrafted_check_tensor_data(gguf_ctx, seed, file)) {
-                printf("\033[1;32mOK\033[0m\n");
+                printf("\033[38;2;51;255;51mOK\033[0m\n");
                 npass++;
             } else {
-                printf("\033[1;31mFAIL\033[0m\n");
+                printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
             }
             ntest++;
         }
@@ -1260,74 +1260,74 @@ static std::pair<int, int> test_roundtrip(
 
     printf("%s: same_version: ", __func__);
     if (gguf_get_version(gguf_ctx_0) == gguf_get_version(gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: same_n_kv: ", __func__);
     if (gguf_get_n_kv(gguf_ctx_0) == gguf_get_n_kv(gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: same_n_tensors: ", __func__);
     if (gguf_get_n_tensors(gguf_ctx_0) == gguf_get_n_tensors(gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_orig_kv_in_read: ", __func__);
     if (all_kv_in_other(gguf_ctx_0, gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_read_kv_in_orig: ", __func__);
     if (all_kv_in_other(gguf_ctx_1, gguf_ctx_0)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_orig_tensors_in_read: ", __func__);
     if (all_tensors_in_other(gguf_ctx_0, gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_read_tensors_in_orig: ", __func__);
     if (all_tensors_in_other(gguf_ctx_1, gguf_ctx_0)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     if (!only_meta) {
         printf("%s: same_tensor_data: ", __func__);
         if (same_tensor_data(ctx_0, ctx_1)) {
-            printf("\033[1;32mOK\033[0m\n");
+            printf("\033[38;2;51;255;51mOK\033[0m\n");
             npass++;
         } else {
-            printf("\033[1;31mFAIL\033[0m\n");
+            printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         }
         ntest++;
     }
@@ -1378,28 +1378,28 @@ static std::pair<int, int> test_gguf_set_kv(ggml_backend_dev_t dev, const unsign
 
     printf("%s: same_n_kv: ", __func__);
     if (gguf_get_n_kv(gguf_ctx_0) == gguf_get_n_kv(gguf_ctx_2)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_kv_0_in_1: ", __func__);
     if (all_kv_in_other(gguf_ctx_0, gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_kv_0_in_2: ", __func__);
     if (all_kv_in_other(gguf_ctx_0, gguf_ctx_2)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
@@ -1407,19 +1407,19 @@ static std::pair<int, int> test_gguf_set_kv(ggml_backend_dev_t dev, const unsign
 
     printf("%s: same_n_kv_after_double_copy: ", __func__);
     if (gguf_get_n_kv(gguf_ctx_0) == gguf_get_n_kv(gguf_ctx_1)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
     printf("%s: all_kv_1_in_0_after_double_copy: ", __func__);
     if (all_kv_in_other(gguf_ctx_1, gguf_ctx_0)) {
-        printf("\033[1;32mOK\033[0m\n");
+        printf("\033[38;2;51;255;51mOK\033[0m\n");
         npass++;
     } else {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
     }
     ntest++;
 
@@ -1495,9 +1495,9 @@ int main(int argc, char ** argv) {
 
     printf("%d/%d tests passed\n", npass, ntest);
     if (npass != ntest) {
-        printf("\033[1;31mFAIL\033[0m\n");
+        printf("\033[1;38;2;186;255;186mFAIL\033[0m\n");
         return 1;
     }
-    printf("\033[1;32mOK\033[0m\n");
+    printf("\033[38;2;51;255;51mOK\033[0m\n");
     return 0;
 }

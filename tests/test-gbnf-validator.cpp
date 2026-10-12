@@ -43,9 +43,9 @@ static void print_error_message(const std::string & input_str, size_t error_pos,
     fprintf(stdout, "Input string:\n");
     fprintf(stdout, "%s", input_str.substr(0, error_pos).c_str());
     if (error_pos < input_str.size()) {
-        fprintf(stdout, "\033[1;31m%c", input_str[error_pos]);
+        fprintf(stdout, "\033[1;38;2;186;255;186m%c", input_str[error_pos]);
         if (error_pos+1 < input_str.size()) {
-            fprintf(stdout, "\033[0;31m%s", input_str.substr(error_pos+1).c_str());
+            fprintf(stdout, "\033[38;2;0;140;40m%s", input_str.substr(error_pos+1).c_str());
         }
         fprintf(stdout, "\033[0m\n");
     }

@@ -16,16 +16,16 @@
 using json = common_json;
 
 // ANSI color codes - using 256-color palette for brighter colors (all bold)
-#define ANSI_RESET       "\033[0m"
-#define ANSI_PURPLE      "\033[1m\x1b[38;5;126m"  // Bold bright purple for main headers
-#define ANSI_CYAN        "\033[1m\x1b[38;5;81m"   // Bold bright cyan for section headers
-#define ANSI_BLUE        "\033[1m\x1b[38;5;12m"   // Bold bright blue for labels
-#define ANSI_ORANGE      "\033[1m\x1b[38;5;209m"  // Bold orange for right differences
-#define ANSI_GREEN       "\033[1m\x1b[38;5;83m"   // Bold bright green for left differences
-#define ANSI_GRAY        "\033[1m\x1b[38;5;240m"  // Bold gray (used for "no variables" message)
-#define ANSI_BOLD        "\033[1m"                // Standalone bold
-#define ANSI_PREFIX      "\033[1m\x1b[38;5;176m"  // Bold color for common prefix
-#define ANSI_SUFFIX      "\033[1m\x1b[38;5;61m"   // Bold color for common suffix
+#define ANSI_RESET       "\033[0;38;2;51;255;51m"
+#define ANSI_PURPLE      "\033[1;38;2;51;255;51m"
+#define ANSI_CYAN        "\033[38;2;40;210;64m"
+#define ANSI_BLUE        "\033[38;2;0;140;40m"
+#define ANSI_ORANGE      "\033[1;38;2;40;210;64m"
+#define ANSI_GREEN       "\033[1;38;2;186;255;186m"
+#define ANSI_GRAY        "\033[38;2;0;140;40m"
+#define ANSI_BOLD        "\033[1;38;2;186;255;186m"
+#define ANSI_PREFIX      "\033[1;38;2;51;255;51m"
+#define ANSI_SUFFIX      "\033[38;2;0;140;40m"
 
 // All template paths extracted from tests/test-chat.cpp
 static const std::vector<std::string> ALL_TEMPLATE_PATHS = {

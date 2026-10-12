@@ -122,9 +122,9 @@ run_conversion_and_inference_lora() {
     # Store the results
     results+=("
     \n\033[1mResults for $model_name with hidden_size $hidden_size:\033[0m
-    \n\033[32m  • Base:\n$OUTPUT_BASE
-    \n\033[34m  • Lora hot:\n$OUTPUT_LORA_HOT
-    \n\033[36m  • Lora merged:\n$OUTPUT_LORA_MERGED
+    \n\033[38;2;51;255;51m  • Base:\n$OUTPUT_BASE
+    \n\033[38;2;40;210;64m  • Lora hot:\n$OUTPUT_LORA_HOT
+    \n\033[1;38;2;40;210;64m  • Lora merged:\n$OUTPUT_LORA_MERGED
     \n \033[0m
     ")
 

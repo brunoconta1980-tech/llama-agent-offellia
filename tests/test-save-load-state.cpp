@@ -27,9 +27,9 @@ enum class test_status {
 
 static const char * test_status_str(test_status status) {
     switch (status) {
-        case test_status::PASS: return "\033[1;32mPASS\033[0m";
-        case test_status::FAIL: return "\033[1;31mFAIL\033[0m";
-        case test_status::SKIP: return "\033[1;33mSKIP\033[0m";
+        case test_status::PASS: return "\033[38;2;51;255;51mPASS\033[0m";
+        case test_status::FAIL: return "\033[1;38;2;186;255;186mFAIL\033[0m";
+        case test_status::SKIP: return "\033[1;38;2;40;210;64mSKIP\033[0m";
     }
     return "";
 }

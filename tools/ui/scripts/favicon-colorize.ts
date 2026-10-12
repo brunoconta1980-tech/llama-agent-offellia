@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -90,9 +90,25 @@ export function padFaviconSvg(svg: string, padding: number): string {
 }
 
 /**
+ * A favicon file that is at least as new as the logo was edited on purpose.
+ * Regenerating it would wipe that edit. Missing files, and files older than
+ * the logo, are still generated.
+ */
+function keepExistingFavicon(outPath: string, sourcePath: string): boolean {
+	if (!existsSync(outPath)) return false;
+
+	try {
+		return statSync(outPath).mtimeMs >= statSync(sourcePath).mtimeMs;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Read `src/lib/assets/logo.svg`, colorize it for both themes, and write
  * the results to the static directory so the PWA asset generator can consume
- * them. Paths can be overridden for tests.
+ * them. Paths can be overridden for tests. An existing output newer than the
+ * source is left untouched.
  */
 export function writeThemeFavicons(
 	lightColor: string,
@@ -108,6 +124,12 @@ export function writeThemeFavicons(
 	const { dark, light } = colorizeFaviconSvg(source, lightColor, darkColor);
 
 	mkdirSync(dirname(lightOutPath), { recursive: true });
-	writeFileSync(lightOutPath, padFaviconSvg(light, padding));
-	writeFileSync(darkOutPath, padFaviconSvg(dark, padding));
+
+	if (!keepExistingFavicon(lightOutPath, sourcePath)) {
+		writeFileSync(lightOutPath, padFaviconSvg(light, padding));
+	}
+
+	if (!keepExistingFavicon(darkOutPath, sourcePath)) {
+		writeFileSync(darkOutPath, padFaviconSvg(dark, padding));
+	}
 }

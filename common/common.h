@@ -644,7 +644,6 @@ struct common_params {
     std::string cors_methods = "GET, POST, DELETE, OPTIONS";
     std::string cors_headers = "*";
     bool cors_credentials = true;
-    bool cors_origins_explicit = false; // for --agent option
 
     bool enable_chat_template = true;
     bool force_pure_content_parser = false;

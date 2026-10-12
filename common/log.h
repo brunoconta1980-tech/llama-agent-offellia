@@ -3,15 +3,16 @@
 #include "ggml.h" // for ggml_log_level
 
 #define LOG_CLR_TO_EOL  "\033[K\r"
-#define LOG_COL_DEFAULT "\033[0m"
-#define LOG_COL_BOLD    "\033[1m"
-#define LOG_COL_RED     "\033[31m"
-#define LOG_COL_GREEN   "\033[32m"
-#define LOG_COL_YELLOW  "\033[33m"
-#define LOG_COL_BLUE    "\033[34m"
-#define LOG_COL_MAGENTA "\033[35m"
-#define LOG_COL_CYAN    "\033[36m"
-#define LOG_COL_WHITE   "\033[37m"
+// IBM 5151 P39 phosphor green. One hue; brightness marks the role.
+#define LOG_COL_DEFAULT "\033[0;38;2;51;255;51m"
+#define LOG_COL_BOLD    "\033[1;38;2;186;255;186m"
+#define LOG_COL_RED     "\033[1;38;2;186;255;186m"
+#define LOG_COL_GREEN   "\033[38;2;51;255;51m"
+#define LOG_COL_YELLOW  "\033[1;38;2;40;210;64m"
+#define LOG_COL_BLUE    "\033[38;2;0;140;40m"
+#define LOG_COL_MAGENTA "\033[1;38;2;51;255;51m"
+#define LOG_COL_CYAN    "\033[38;2;40;210;64m"
+#define LOG_COL_WHITE   "\033[1;38;2;186;255;186m"
 
 #ifndef __GNUC__
 #    define LOG_ATTRIBUTE_FORMAT(...)

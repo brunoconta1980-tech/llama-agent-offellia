@@ -27,12 +27,13 @@
 
 namespace fs = std::filesystem;
 
-static const char * ANSI_RESET   = "\x1b[0m";
-static const char * ANSI_RED     = "\x1b[31m";
-static const char * ANSI_YELLOW  = "\x1b[33m";
-static const char * ANSI_MAGENTA = "\x1b[35m";
-static const char * ANSI_CYAN    = "\x1b[36m";
-static const char * ANSI_GRAY    = "\x1b[90m";
+// IBM 5151 phosphor green. Reset returns to that foreground, not the terminal default.
+static const char * ANSI_RESET   = "\x1b[0;38;2;51;255;51m";
+static const char * ANSI_RED     = "\x1b[1;38;2;186;255;186m";
+static const char * ANSI_YELLOW  = "\x1b[1;38;2;40;210;64m";
+static const char * ANSI_MAGENTA = "\x1b[38;2;51;255;51m";
+static const char * ANSI_CYAN    = "\x1b[38;2;40;210;64m";
+static const char * ANSI_GRAY    = "\x1b[38;2;0;140;40m";
 static const char * ANSI_DIM     = "\x1b[2m";
 static const char * ANSI_BOLD    = "\x1b[1m";
 static const char SPINNER_CHARS[] = {'|', '/', '-', '\\'};
@@ -325,6 +326,9 @@ tui_renderer::tui_renderer(config cfg)
 
     setup_raw_mode();
     fputs("\x1b[?2004h", out_);
+    if (color_) {
+        fputs(ANSI_RESET, out_);
+    }
     query_terminal_size();
     install_resize_handler();
 
@@ -1249,7 +1253,8 @@ void tui_renderer::repaint_screen() {
     fprintf(out_, "\x1b[%d;1H", available - static_cast<int>(visible.size() - first) + 1);
     for (size_t i = first; i < visible.size(); ++i) {
         fwrite(visible[i].data(), 1, visible[i].size(), out_);
-        fputs("\x1b[0m\r\n", out_);
+        fputs(color_ ? ANSI_RESET : "\x1b[0m", out_);
+        fputs("\r\n", out_);
     }
     previous_region_.clear();
     managed_visible_ = false;
@@ -1381,7 +1386,7 @@ void tui_renderer::render_loop() {
     flush_text_buffer(true);
     flush_pending_transcript();
     clear_managed_region();
-    fputs("\x1b[?2026l\x1b[?2004l\x1b[?45l\x1b[?25h", out_);
+    fputs("\x1b[?2026l\x1b[?2004l\x1b[?45l\x1b[?25h\x1b[0m", out_);
     fflush(out_);
 }
 

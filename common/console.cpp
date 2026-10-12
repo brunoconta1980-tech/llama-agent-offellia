@@ -37,15 +37,17 @@
 #include <termios.h>
 #endif
 
-#define ANSI_COLOR_RED     "\x1b[31m"
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_YELLOW  "\x1b[33m"
-#define ANSI_COLOR_BLUE    "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN    "\x1b[36m"
-#define ANSI_COLOR_GRAY    "\x1b[90m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+// IBM 5151 P39 phosphor green (#33FF33). Reset keeps that foreground.
+#define ANSI_COLOR_RED     "\x1b[1;38;2;186;255;186m"
+#define ANSI_COLOR_GREEN   "\x1b[38;2;51;255;51m"
+#define ANSI_COLOR_YELLOW  "\x1b[1;38;2;40;210;64m"
+#define ANSI_COLOR_BLUE    "\x1b[38;2;0;140;40m"
+#define ANSI_COLOR_MAGENTA "\x1b[38;2;51;255;51m"
+#define ANSI_COLOR_CYAN    "\x1b[38;2;40;210;64m"
+#define ANSI_COLOR_GRAY    "\x1b[38;2;0;140;40m"
+#define ANSI_COLOR_RESET   "\x1b[0;38;2;51;255;51m"
 #define ANSI_BOLD          "\x1b[1m"
+#define ANSI_TERMINAL_RESET "\x1b[0m"
 
 namespace console {
 
@@ -197,11 +199,22 @@ namespace console {
 
         setlocale(LC_ALL, "");
 #endif
+        if (advanced_display && out) {
+            fputs(ANSI_COLOR_RESET, out);
+            fflush(out);
+            current_display = DISPLAY_TYPE_RESET;
+        }
     }
 
     void cleanup() {
-        // Reset console display
-        set_display(DISPLAY_TYPE_RESET);
+        // Hand the terminal foreground back. The session used phosphor green.
+        if (advanced_display && out) {
+            common_log_flush(common_log_main());
+            fputs(ANSI_TERMINAL_RESET, out);
+            fflush(out);
+            current_display = DISPLAY_TYPE_RESET;
+            advanced_display = false;
+        }
 
 #if !defined(_WIN32)
         // Restore settings on POSIX systems

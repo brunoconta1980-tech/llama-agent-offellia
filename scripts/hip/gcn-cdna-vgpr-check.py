@@ -104,7 +104,7 @@ def main():
             status = "[IGNORED]" if func_name in ignored else ""
             location = data.get('location', log_file)
             # Print in red if not ignored
-            color_code = "\033[91m" if func_name not in ignored else ""
+            color_code = "\033[1;38;2;186;255;186m" if func_name not in ignored else ""
             reset_code = "\033[0m" if func_name not in ignored else ""
             print(f"{color_code}{location}: {func_name} - Total VGPRs: {total_vgprs} ({data['vgprs']} + {data['spill']}) {status}{reset_code}")  # noqa: NP100
             if func_name not in ignored:

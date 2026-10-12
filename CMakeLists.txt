@@ -134,8 +134,8 @@ option(LLAMA_BUILD_TOOLS     "llama: build tools"                               
 option(LLAMA_BUILD_EXAMPLES  "llama: build examples"                                                             ${LLAMA_STANDALONE})
 option(LLAMA_BUILD_SERVER    "llama: build server example"                                                       ${LLAMA_STANDALONE})
 option(LLAMA_BUILD_APP       "llama: build the unified binary"                                                   ${LLAMA_STANDALONE})
-option(LLAMA_BUILD_UI        "llama: build the embedded Web UI for server"                                       OFF)
-option(LLAMA_USE_PREBUILT_UI "llama: use prebuilt UI from HF Bucket when available" ON)
+option(LLAMA_BUILD_UI        "llama: build the embedded Web UI for server from local sources"                   ON)
+option(LLAMA_USE_PREBUILT_UI "llama: download a prebuilt UI during compilation (disabled; no external fetch)"       OFF)
 
 option(LLAMA_TOOLS_INSTALL "llama: install tools" ${LLAMA_TOOLS_INSTALL_DEFAULT})
 option(LLAMA_TESTS_INSTALL "llama: install tests" ON)

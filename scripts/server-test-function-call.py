@@ -22,12 +22,12 @@ RESET = "\x1b[0m"
 BOLD = "\x1b[1m"
 DIM = "\x1b[2m"
 # Foreground colors
-CYAN = "\x1b[36m"
-YELLOW = "\x1b[33m"
-GREEN = "\x1b[32m"
-RED = "\x1b[31m"
-BLUE = "\x1b[34m"
-WHITE = "\x1b[97m"
+CYAN = "\x1b[38;2;40;210;64m"
+YELLOW = "\x1b[1;38;2;40;210;64m"
+GREEN = "\x1b[38;2;51;255;51m"
+RED = "\x1b[1;38;2;186;255;186m"
+BLUE = "\x1b[38;2;0;140;40m"
+WHITE = "\x1b[1;38;2;186;255;186m"
 
 
 def _print(text="", end="\n"):
